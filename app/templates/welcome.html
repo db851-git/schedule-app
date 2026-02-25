@@ -4,13 +4,9 @@
     <h1 class="text-4xl font-semibold tracking-tight text-gray-900">Manage your day, beautifully.</h1>
     <p class="text-gray-500">A clean, focused workspace for your tasks and schedule.</p>
     
-    <form method="POST" class="glass-card p-6 rounded-2xl shadow-sm space-y-4">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div>
-            <label class="block text-sm font-medium text-gray-700 text-left mb-1">What should we call you?</label>
-            <input type="text" name="name" required class="w-full border-gray-200 rounded-lg focus:ring-brand-500 focus:border-brand-500 text-sm px-3 py-2 border shadow-sm" placeholder="e.g. Deb">
-        </div>
-        <button type="submit" class="w-full bg-brand-900 text-white rounded-lg py-2 text-sm font-medium hover:bg-gray-800 transition">Enter Workspace</button>
-    </form>
+    <div class="pt-6 flex gap-4 justify-center">
+        <a href="{{ url_for('auth.register') }}" class="bg-brand-900 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition">Create Account</a>
+        <a href="{{ url_for('auth.login') }}" class="bg-white border border-gray-200 text-gray-900 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition shadow-sm">Sign In</a>
+    </div>
 </div>
 {% endblock %}

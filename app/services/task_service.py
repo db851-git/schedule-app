@@ -4,16 +4,16 @@ from app import db
 
 class TaskService:
     @staticmethod
-    def get_tasks_for_session(session_id: str, date_filter=None):
-        query = Task.query.filter_by(session_id=session_id)
+    def get_tasks_for_session(user_id: int, date_filter=None):
+        query = Task.query.filter_by(user_id=user_id)
         if date_filter:
             query = query.filter_by(task_date=date_filter)
         return query.order_by(Task.task_date, Task.start_time).all()
 
     @staticmethod
-    def create_task(session_id, data):
+    def create_task(user_id, data):
         new_task = Task(
-            session_id=session_id,
+            user_id=user_id,
             title=data['title'],
             category=data['category'],
             task_date=datetime.strptime(data['task_date'], '%Y-%m-%d').date(),
@@ -27,8 +27,8 @@ class TaskService:
         return new_task
 
     @staticmethod
-    def toggle_status(task_id, session_id):
-        task = Task.query.filter_by(id=task_id, session_id=session_id).first_or_404()
+    def toggle_status(task_id, user_id):
+        task = Task.query.filter_by(id=task_id, user_id=user_id).first_or_404()
         task.status = 'Completed' if task.status != 'Completed' else 'Pending'
         db.session.commit()
         return task

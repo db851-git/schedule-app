@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chrono | Modern Schedule</title>
+    <title>Zenith | Schedule</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/feather-icons"></script>
@@ -26,12 +26,18 @@
     <nav class="border-b border-gray-100 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-2 font-semibold text-lg tracking-tight">
-                <i data-feather="clock" class="w-5 h-5 text-brand-500"></i> Chrono
+                <i data-feather="box" class="w-5 h-5 text-brand-900"></i> Zenith
             </div>
             <div class="flex gap-4 text-sm font-medium text-gray-500 items-center">
-                <a href="{{ url_for('main.dashboard') }}" class="hover:text-gray-900 transition">Dashboard</a>
-                <a href="{{ url_for('main.analytics') }}" class="hover:text-gray-900 transition">Analytics</a>
-                <button class="bg-brand-900 text-white px-3 py-1.5 rounded-md text-xs hover:bg-gray-800 transition shadow-sm">Upgrade to Pro</button>
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('main.dashboard') }}" class="hover:text-gray-900 transition">Dashboard</a>
+                    <a href="{{ url_for('main.analytics') }}" class="hover:text-gray-900 transition">Analytics</a>
+                    <a href="{{ url_for('auth.logout') }}" class="hover:text-red-600 transition ml-2">Sign Out</a>
+                    <button class="bg-brand-900 text-white px-3 py-1.5 rounded-md text-xs hover:bg-gray-800 transition shadow-sm ml-2">Upgrade to Pro</button>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="hover:text-gray-900 transition">Log In</a>
+                    <a href="{{ url_for('auth.register') }}" class="bg-brand-900 text-white px-4 py-1.5 rounded-md text-xs hover:bg-gray-800 transition shadow-sm">Get Started</a>
+                {% endif %}
             </div>
         </div>
     </nav>
