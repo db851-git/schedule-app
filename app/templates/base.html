@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrono | Modern Schedule</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { 50: '#f8fafc', 500: '#64748b', 900: '#0f172a' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #FAFAFA; color: #111827; }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+    <nav class="border-b border-gray-100 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2 font-semibold text-lg tracking-tight">
+                <i data-feather="clock" class="w-5 h-5 text-brand-500"></i> Chrono
+            </div>
+            <div class="flex gap-4 text-sm font-medium text-gray-500 items-center">
+                <a href="{{ url_for('main.dashboard') }}" class="hover:text-gray-900 transition">Dashboard</a>
+                <a href="{{ url_for('main.analytics') }}" class="hover:text-gray-900 transition">Analytics</a>
+                <button class="bg-brand-900 text-white px-3 py-1.5 rounded-md text-xs hover:bg-gray-800 transition shadow-sm">Upgrade to Pro</button>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        {% block content %}{% endblock %}
+    </main>
+    <script>feather.replace();</script>
+</body>
+</html>

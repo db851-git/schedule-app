@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center mt-20">
+    <h1 class="text-6xl font-bold text-gray-900">404</h1>
+    <p class="text-xl text-gray-500 mt-4">We couldn't find the page you're looking for.</p>
+    <a href="{{ url_for('main.index') }}" class="inline-block mt-6 bg-brand-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition">Return Home</a>
+</div>
+{% endblock %}
