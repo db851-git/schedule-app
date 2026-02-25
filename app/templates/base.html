@@ -33,7 +33,6 @@
                     <a href="{{ url_for('main.dashboard') }}" class="hover:text-gray-900 transition">Dashboard</a>
                     <a href="{{ url_for('main.analytics') }}" class="hover:text-gray-900 transition">Analytics</a>
                     <a href="{{ url_for('auth.logout') }}" class="hover:text-red-600 transition ml-2">Sign Out</a>
-                    <button class="bg-brand-900 text-white px-3 py-1.5 rounded-md text-xs hover:bg-gray-800 transition shadow-sm ml-2">Upgrade to Pro</button>
                 {% else %}
                     <a href="{{ url_for('auth.login') }}" class="hover:text-gray-900 transition">Log In</a>
                     <a href="{{ url_for('auth.register') }}" class="bg-brand-900 text-white px-4 py-1.5 rounded-md text-xs hover:bg-gray-800 transition shadow-sm">Get Started</a>
