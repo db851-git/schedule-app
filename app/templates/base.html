@@ -21,6 +21,8 @@
         body { background-color: #FAFAFA; color: #111827; }
         .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(0,0,0,0.05); }
     </style>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#111827">
 </head>
 <body class="antialiased min-h-screen flex flex-col">
     <nav class="border-b border-gray-100 bg-white">
@@ -43,5 +45,14 @@
         {% block content %}{% endblock %}
     </main>
     <script>feather.replace();</script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker registered!', reg))
+        .catch(err => console.log('Service Worker registration failed:', err));
+    });
+  }
+</script>
 </body>
 </html>

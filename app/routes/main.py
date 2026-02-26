@@ -70,3 +70,8 @@ def toggle_task(task_id):
             'pending': pending
         }
     })
+# --- NEW PWA SERVICE WORKER ROUTE ---
+@main_bp.route('/sw.js')
+def sw():
+    # This serves the service worker from the root URL so it controls the whole app
+    return current_app.send_static_file('sw.js')
