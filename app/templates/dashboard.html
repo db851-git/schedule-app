@@ -10,11 +10,11 @@
         <div class="grid grid-cols-2 gap-4">
             <div class="glass-card p-4 rounded-xl">
                 <p class="text-xs text-gray-500 font-medium">Today's Progress</p>
-                <p class="text-2xl font-semibold">{{ stats.percent }}%</p>
+                <p id="stat-percent" class="text-2xl font-semibold">{{ stats.percent }}%</p>
             </div>
             <div class="glass-card p-4 rounded-xl">
                 <p class="text-xs text-gray-500 font-medium">Today's Pending</p>
-                <p class="text-2xl font-semibold">{{ stats.pending }}</p>
+                <p id="stat-pending" class="text-2xl font-semibold">{{ stats.pending }}</p>
             </div>
         </div>
 
@@ -31,8 +31,9 @@
         <div id="task-form-container" class="hidden glass-card p-5 rounded-xl transition-all duration-300">
             <h3 class="text-sm font-medium mb-4">Schedule Details</h3>
             
-            <form method="POST" class="space-y-3">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <form method="POST" class="space-y-3" id="main-task-form">
+                <input type="hidden" name="csrf_token" id="csrf_token" value="{{ csrf_token() }}">
+                
                 <input type="text" name="title" required placeholder="Task title" class="w-full text-sm border-gray-200 rounded-lg p-2 border focus:ring-1 focus:ring-brand-900 outline-none" {% if not can_create %}disabled{% endif %}>
                 <div class="flex gap-2">
                     <input type="date" name="task_date" required class="w-1/2 text-sm border-gray-200 rounded-lg p-2 border text-gray-500" {% if not can_create %}disabled{% endif %}>
@@ -68,7 +69,7 @@
 
             <div class="space-y-3">
             {% for task in day_group.list %}
-                <div class="p-4 rounded-xl flex items-center justify-between group transition hover:shadow-md border
+                <div id="task-tile-{{ task.id }}" class="p-4 rounded-xl flex items-center justify-between group transition hover:shadow-md border
                     {% if task.status == 'Completed' %}opacity-50 grayscale bg-gray-50 border-gray-200
                     {% elif task.category == 'Work' %}bg-red-50 border-red-100
                     {% elif task.category == 'Study' %}bg-blue-50 border-blue-100
@@ -76,18 +77,15 @@
                     {% else %}bg-white border-gray-100{% endif %}">
                     
                     <div class="flex items-center gap-4">
-                        <form method="POST" action="{{ url_for('main.toggle_task', task_id=task.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="w-5 h-5 rounded-full border flex items-center justify-center transition focus:outline-none
-                                {% if task.category == 'Work' %}border-red-300 hover:border-red-900
-                                {% elif task.category == 'Study' %}border-blue-300 hover:border-blue-900
-                                {% elif task.category == 'Personal' %}border-emerald-300 hover:border-emerald-900
-                                {% else %}border-gray-300 hover:border-gray-900{% endif %}">
-                                {% if task.status == 'Completed' %}<div class="w-3 h-3 bg-gray-900 rounded-full"></div>{% endif %}
-                            </button>
-                        </form>
+                        <button type="button" onclick="toggleTaskStatus({{ task.id }}, this)" class="w-5 h-5 rounded-full border flex items-center justify-center transition focus:outline-none
+                            {% if task.category == 'Work' %}border-red-300 hover:border-red-900
+                            {% elif task.category == 'Study' %}border-blue-300 hover:border-blue-900
+                            {% elif task.category == 'Personal' %}border-emerald-300 hover:border-emerald-900
+                            {% else %}border-gray-300 hover:border-gray-900{% endif %}">
+                            {% if task.status == 'Completed' %}<div class="w-3 h-3 bg-gray-900 rounded-full"></div>{% endif %}
+                        </button>
                         <div>
-                            <h4 class="text-sm font-medium text-gray-900 {% if task.status == 'Completed' %}line-through{% endif %}">{{ task.title }}</h4>
+                            <h4 id="task-title-{{ task.id }}" class="text-sm font-medium text-gray-900 {% if task.status == 'Completed' %}line-through{% endif %}">{{ task.title }}</h4>
                             <p class="text-xs text-gray-500 mt-0.5">{{ task.start_time.strftime('%H:%M') }} - {{ task.end_time.strftime('%H:%M') }} • {{ task.category }}</p>
                         </div>
                     </div>
@@ -111,15 +109,13 @@
 </div>
 
 <script>
+    // Existing script for hiding/showing the form
     document.addEventListener('DOMContentLoaded', function() {
         const toggleBtn = document.getElementById('toggle-form-btn');
         const formContainer = document.getElementById('task-form-container');
         
         toggleBtn.addEventListener('click', function() {
-            // Toggle the 'hidden' class on the form
             formContainer.classList.toggle('hidden');
-            
-            // Change the button appearance based on whether it is open or closed
             if (formContainer.classList.contains('hidden')) {
                 toggleBtn.innerHTML = '<i data-feather="plus" class="w-4 h-4"></i> Add New Schedule';
                 toggleBtn.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
@@ -129,10 +125,46 @@
                 toggleBtn.classList.remove('bg-brand-900', 'text-white', 'hover:bg-gray-800');
                 toggleBtn.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
             }
-            
-            // Re-render the icons inside the button
             feather.replace();
         });
     });
+
+    // NEW OPTIMIZED FUNCTION: Background toggle
+    async function toggleTaskStatus(taskId, btnElement) {
+        // Grab the security token
+        const csrfToken = document.getElementById('csrf_token').value;
+
+        // Send a silent background request to the server
+        const response = await fetch(`/task/${taskId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            
+            // Get the HTML elements for this specific task
+            const tile = document.getElementById(`task-tile-${taskId}`);
+            const title = document.getElementById(`task-title-${taskId}`);
+            
+            // Instantly update the visual styling based on the new status
+            if (data.new_status === 'Completed') {
+                tile.classList.add('opacity-50', 'grayscale');
+                title.classList.add('line-through');
+                btnElement.innerHTML = '<div class="w-3 h-3 bg-gray-900 rounded-full"></div>';
+            } else {
+                tile.classList.remove('opacity-50', 'grayscale');
+                title.classList.remove('line-through');
+                btnElement.innerHTML = '';
+            }
+
+            // Instantly update the progress numbers at the top!
+            document.getElementById('stat-percent').innerText = data.stats.percent + '%';
+            document.getElementById('stat-pending').innerText = data.stats.pending;
+        }
+    }
 </script>
 {% endblock %}
