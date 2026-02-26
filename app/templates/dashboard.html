@@ -166,5 +166,53 @@
             document.getElementById('stat-pending').innerText = data.stats.pending;
         }
     }
+    // NEW INSTANTANEOUS FUNCTION: Optimistic UI Update
+    async function toggleTaskStatus(taskId, btnElement) {
+        // 1. Grab elements
+        const csrfToken = document.getElementById('csrf_token').value;
+        const tile = document.getElementById(`task-tile-${taskId}`);
+        const title = document.getElementById(`task-title-${taskId}`);
+        
+        // 2. Determine current state
+        const isCompleted = tile.classList.contains('opacity-50');
+
+        // 3. OPTIMISTIC UPDATE: Change the UI instantly (0 seconds latency)
+        if (isCompleted) {
+            // Revert to pending visually instantly
+            tile.classList.remove('opacity-50', 'grayscale');
+            title.classList.remove('line-through');
+            btnElement.innerHTML = '';
+        } else {
+            // Mark as completed visually instantly
+            tile.classList.add('opacity-50', 'grayscale');
+            title.classList.add('line-through');
+            btnElement.innerHTML = '<div class="w-3 h-3 bg-gray-900 rounded-full"></div>';
+        }
+
+        // 4. Send background request to the server to actually save the data
+        try {
+            const response = await fetch(`/task/${taskId}/toggle`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Update the progress numbers at the top once the server confirms
+                document.getElementById('stat-percent').innerText = data.stats.percent + '%';
+                document.getElementById('stat-pending').innerText = data.stats.pending;
+            } else {
+                throw new Error("Server failed to update");
+            }
+        } catch (error) {
+            // If the internet drops or server fails, alert the user and refresh to fix the UI
+            console.error("Task update failed:", error);
+            alert("Network error: Could not save task status.");
+            location.reload(); 
+        }
+    }
 </script>
 {% endblock %}
