@@ -18,13 +18,18 @@
             </div>
         </div>
 
-        <div class="glass-card p-5 rounded-xl">
-            <h3 class="text-sm font-medium mb-4">Schedule New Task</h3>
-            {% with messages = get_flashed_messages() %}
-              {% if messages %}
-                <div class="bg-yellow-50 text-yellow-800 text-xs p-3 rounded-md mb-4">{{ messages[0] }}</div>
-              {% endif %}
-            {% endwith %}
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="bg-yellow-50 text-yellow-800 text-sm p-3 rounded-md">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <button id="toggle-form-btn" class="w-full bg-brand-900 text-white rounded-lg py-2.5 text-sm font-medium hover:bg-gray-800 transition flex items-center justify-center gap-2 shadow-sm">
+            <i data-feather="plus" class="w-4 h-4"></i> Add New Schedule
+        </button>
+
+        <div id="task-form-container" class="hidden glass-card p-5 rounded-xl transition-all duration-300">
+            <h3 class="text-sm font-medium mb-4">Schedule Details</h3>
             
             <form method="POST" class="space-y-3">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -46,7 +51,7 @@
                     <option value="Medium" selected>Medium Priority</option>
                     <option value="High">High Priority</option>
                 </select>
-                <button type="submit" class="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium hover:bg-gray-800 transition disabled:opacity-50" {% if not can_create %}disabled{% endif %}>Add to Schedule</button>
+                <button type="submit" class="w-full bg-gray-900 text-white rounded-lg py-2 text-sm font-medium hover:bg-gray-800 transition disabled:opacity-50" {% if not can_create %}disabled{% endif %}>Save Task</button>
             </form>
         </div>
     </div>
@@ -54,7 +59,7 @@
     <div class="w-full md:w-2/3">
         <div class="flex justify-between items-center mb-6">
             <h3 class="font-medium text-gray-900">Your Schedule</h3>
-            </div>
+        </div>
 
         {% for day_group in tasks|groupby('task_date') %}
             <div class="mt-6 mb-3 border-b border-gray-200 pb-2">
@@ -104,4 +109,30 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggle-form-btn');
+        const formContainer = document.getElementById('task-form-container');
+        
+        toggleBtn.addEventListener('click', function() {
+            // Toggle the 'hidden' class on the form
+            formContainer.classList.toggle('hidden');
+            
+            // Change the button appearance based on whether it is open or closed
+            if (formContainer.classList.contains('hidden')) {
+                toggleBtn.innerHTML = '<i data-feather="plus" class="w-4 h-4"></i> Add New Schedule';
+                toggleBtn.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+                toggleBtn.classList.add('bg-brand-900', 'text-white', 'hover:bg-gray-800');
+            } else {
+                toggleBtn.innerHTML = '<i data-feather="x" class="w-4 h-4"></i> Cancel';
+                toggleBtn.classList.remove('bg-brand-900', 'text-white', 'hover:bg-gray-800');
+                toggleBtn.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+            }
+            
+            // Re-render the icons inside the button
+            feather.replace();
+        });
+    });
+</script>
 {% endblock %}
