@@ -22,7 +22,8 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         
-        # Log them in automatically
+        # NEW: Tell Flask to remember this session for 30 days
+        session.permanent = True
         session['user_id'] = new_user.id
         session['user_name'] = new_user.name
         return redirect(url_for('main.dashboard'))
@@ -37,6 +38,8 @@ def login():
         user = User.query.filter_by(email=email).first()
         
         if user and user.check_password(password):
+            # NEW: Tell Flask to remember this session for 30 days
+            session.permanent = True
             session['user_id'] = user.id
             session['user_name'] = user.name
             return redirect(url_for('main.dashboard'))

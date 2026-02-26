@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,11 +10,14 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///schedule.db'
     FREE_PLAN_TASK_LIMIT = 5
     
-    # NEW: Database connection pooling to prevent 500 Errors after server sleep
+    # Database connection pooling to prevent 500 Errors
     SQLALCHEMY_ENGINE_OPTIONS = {
-        "pool_pre_ping": True,  # Checks if the connection is alive before using it
-        "pool_recycle": 300,    # Recycles connections older than 5 minutes (300 seconds)
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
     }
+    
+    # NEW: Keep users logged in for 30 days
+    PERMANENT_SESSION_LIFETIME = timedelta(days=30)
 
 class DevelopmentConfig(Config):
     DEBUG = True
