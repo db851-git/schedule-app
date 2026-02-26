@@ -1,3 +1,5 @@
+import uuid
+from datetime import datetime
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from app.services.task_service import TaskService
 from app.services.plan_service import PlanService
@@ -6,14 +8,12 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    # If they are already logged in, send them straight to the dashboard
     if 'user_id' in session:
         return redirect(url_for('main.dashboard'))
     return render_template('welcome.html')
 
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
-    # Security check: If not logged in, kick them to the login page
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
 
@@ -26,14 +26,18 @@ def dashboard():
         TaskService.create_task(user_id, request.form)
         return redirect(url_for('main.dashboard'))
     elif request.method == 'POST' and not can_create:
-        flash("You've reached your free tier limit for today. Upgrade to Pro!", "warning")
+        flash("You've reached your free tier limit for today.", "warning")
 
     tasks = TaskService.get_tasks_for_session(user_id)
     
+    # --- NEW: Calculate stats for TODAY only ---
+    today = datetime.utcnow().date()
+    todays_tasks = [t for t in tasks if t.task_date == today]
+    
     stats = {
-        'total': len(tasks),
-        'completed': sum(1 for t in tasks if t.status == 'Completed'),
-        'pending': sum(1 for t in tasks if t.status != 'Completed')
+        'total': len(todays_tasks),
+        'completed': sum(1 for t in todays_tasks if t.status == 'Completed'),
+        'pending': sum(1 for t in todays_tasks if t.status != 'Completed')
     }
     stats['percent'] = int((stats['completed'] / stats['total'] * 100)) if stats['total'] > 0 else 0
 
@@ -44,9 +48,3 @@ def toggle_task(task_id):
     if 'user_id' in session:
         TaskService.toggle_status(task_id, session['user_id'])
     return redirect(url_for('main.dashboard'))
-    
-@main_bp.route('/analytics')
-def analytics():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
-    return render_template('analytics.html')

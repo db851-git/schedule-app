@@ -31,7 +31,6 @@
             <div class="flex gap-4 text-sm font-medium text-gray-500 items-center">
                 {% if session.get('user_id') %}
                     <a href="{{ url_for('main.dashboard') }}" class="hover:text-gray-900 transition">Dashboard</a>
-                    <a href="{{ url_for('main.analytics') }}" class="hover:text-gray-900 transition">Analytics</a>
                     <a href="{{ url_for('auth.logout') }}" class="hover:text-red-600 transition ml-2">Sign Out</a>
                 {% else %}
                     <a href="{{ url_for('auth.login') }}" class="hover:text-gray-900 transition">Log In</a>
