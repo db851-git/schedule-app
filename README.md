@@ -1,6 +1,7 @@
 # Zenith | Modern SaaS Task & Schedule Management
 
-![Zenith Preview](https://via.placeholder.com/1000x500.png?text=Insert+Screenshot+of+Dashboard+Here)
+<img width="1440" height="677" alt="Screenshot 2026-02-26 at 9 32 58 am" src="https://github.com/user-attachments/assets/ede2395e-6bd4-4936-b264-93ea8c785e47" />
+
 
 **Live Application:** https://schedule-app-deb.onrender.com
 
